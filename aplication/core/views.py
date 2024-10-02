@@ -1,6 +1,7 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Doctor
+from .forms import DoctorForm
 
 # Create your views here.
 def home(request):
@@ -16,7 +17,21 @@ def doctor_List(request):
     print(data)
     return render(request,"core/doctor/list.html",data)
  
-def doctor_Create(request):
-      data={"title":"Medical","title1":"Registro de Doctores"}
-      
-      return render(request,"core/doctor/create.html",data)
+def doctor_create(request):
+   data = {"title": "Doctores","title1": "Añadir Doctores"}
+   if request.method == "POST":
+      form = DoctorForm(request.POST)
+      if form.is_valid():
+         form.save()
+         return redirect("core:doctor_list")
+      else:
+         data["form"] = form
+         data["error"] = "Error al crear el Doctor."
+         return render(request, "core/doctor/form.html", data)
+   else:
+      form = DoctorForm()
+      data["form"] = form
+   print(form)
+   return render(request, "core/doctor/form.html", data)
+            
+
